@@ -23,6 +23,7 @@ void launchUNEXT(void);
 void enemyFeeRise(void);
 void referralProgram(void);
 void premiumProgram(void);
+void rakutenMobilePromo(void);
 
 int main(void)
 {
@@ -37,6 +38,9 @@ int main(void)
 
     puts("\n/* === Scene 3 : Premium Card Coupon Thread ======================= */");
     premiumProgram();       /* ギガ割引クーポンの配給説明 */
+
+    puts("\n/* === Scene 4 : Rakuten Mobile Main Appeal Broadcast ============= */");
+    rakutenMobilePromo();   /* 楽天モバイルの魅力を全力アピール */
 
     puts("\n/* === End of Story: Return 0 ===================================== */");
     return 0;
@@ -72,6 +76,19 @@ void premiumProgram(void)
     printf("Lettuce_Hime: \"楽天プレミアムカード/ブラックカード会員へ毎月ギガ割引クーポン！\"\n");
     printf("              詳細 → %s\n", "https://www.rakuten-card.co.jp/premiumprogram/rakuten-mobile/");
 }
+
+/* ----------------------------------------------------------------------- */
+void rakutenMobilePromo(void)
+/* 楽天モバイルの魅力を全キャラクタで一斉アピール */
+{
+    puts("Tomato_Taro:   \"楽天モバイルは国内通話・SMSが Rakuten Link アプリで無料！\"");
+    puts("Broccoli_Kun:  \"データ使い放題でも月最大 3,278 円！ 使った分だけ課金だ！\"");
+    puts("Carrot_Sensei: \"楽天ポイントが貯まる・使える！ 経済圏フル活用でお得度MAX！\"");
+    puts("Lettuce_Hime:  \"海外 151 の国と地域でデータ通信 2GB/月 無料！旅行にも最強！\"");
+    printf("ALL:           \"詳しくはこちら → %s\"\n",
+           "https://network.mobile.rakuten.co.jp/");
+}
+
 
 /* =========================================================================
    付録リンク
