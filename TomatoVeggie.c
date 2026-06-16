@@ -3,6 +3,10 @@
    ========================================================================= */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <signal.h>
 
 /* ─── 野菜キャラクタ定義 ─── */
 typedef struct {
@@ -24,26 +28,108 @@ void enemyFeeRise(void);
 void referralProgram(void);
 void premiumProgram(void);
 void rakutenMobilePromo(void);
+void kioskBanner(int loop);
+void runStory(void);
 
-int main(void)
+/* ─── キオスクモード用グローバルフラグ ─── */
+static volatile int g_running = 1;
+
+/* Ctrl+C でループを安全に終了 */
+static void handleSigint(int sig)
 {
-    puts("/* === Scene 0 : Memory Allocation for HOT NEWS ==================== */");
-    launchUNEXT();          /* Rakuten最強U-NEXT 先行キャンペーン開幕 */
+    (void)sig;
+    g_running = 0;
+}
 
-    puts("\n/* === Scene 1 : Competitor Fee Hike Interrupt ==================== */");
-    enemyFeeRise();         /* 競合他社の手数料値上げに対抗 */
 
-    puts("\n/* === Scene 2 : Referral Link Injection ========================== */");
-    referralProgram();      /* 従業員紹介プログラムでポイント盛り */
+int main(int argc, char *argv[])
+{
+    int kiosk = (argc >= 2 && strcmp(argv[1], "--kiosk") == 0);
 
-    puts("\n/* === Scene 3 : Premium Card Coupon Thread ======================= */");
-    premiumProgram();       /* ギガ割引クーポンの配給説明 */
+    if (kiosk) {
+        /* キオスクモード: Ctrl+C で終了するまでループ */
+        signal(SIGINT, handleSigint);
+        int loop = 1;
+        while (g_running) {
+            system("clear");
+            kioskBanner(loop++);
+            runStory();
+            if (!g_running) break;
+            /* ループ間のインターバル（次のサイクルまでカウントダウン表示） */
+            printf("\n\033[33m  次のループまで 10 秒...  Ctrl+C で終了\033[0m\n");
+            fflush(stdout);
+            for (int i = 10; i > 0 && g_running; i--) {
+                sleep(1);
+            }
+        }
+        system("clear");
+        puts("  [Kiosk] ご覧いただきありがとうございました！");
+    } else {
+        /* 通常モード: 1 回実行して終了 */
+        runStory();
+        puts("\n/* === End of Story: Return 0 ===================================== */");
+    }
 
-    puts("\n/* === Scene 4 : Rakuten Mobile Main Appeal Broadcast ============= */");
-    rakutenMobilePromo();   /* 楽天モバイルの魅力を全力アピール */
-
-    puts("\n/* === End of Story: Return 0 ===================================== */");
     return 0;
+}
+
+/* ----------------------------------------------------------------------- */
+void kioskBanner(int loop)
+/* キオスクモード用の目立つヘッダーバナー */
+{
+    puts("\033[1;31m"); /* 太字・赤 */
+    puts("  ██████╗  █████╗ ██╗  ██╗██╗   ██╗████████╗███████╗███╗   ██╗");
+    puts("  ██╔══██╗██╔══██╗██║ ██╔╝██║   ██║╚══██╔══╝██╔════╝████╗  ██║");
+    puts("  ██████╔╝███████║█████╔╝ ██║   ██║   ██║   █████╗  ██╔██╗ ██║");
+    puts("  ██╔══██╗██╔══██║██╔═██╗ ██║   ██║   ██║   ██╔══╝  ██║╚██╗██║");
+    puts("  ██║  ██║██║  ██║██║  ██╗╚██████╔╝   ██║   ███████╗██║ ╚████║");
+    puts("  ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚══════╝╚═╝  ╚═══╝");
+    puts("\033[0m");
+    puts("\033[1;37m  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+    puts("      🍅 楽天モバイル 最強プラン  ―野菜キャラが全力アピール！―");
+    puts("  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m");
+    printf("\033[90m  [Kiosk loop #%d]\033[0m\n\n", loop);
+}
+
+/* ----------------------------------------------------------------------- */
+void runStory(void)
+/* メインストーリーを 1 サイクル実行する（通常／キオスク共用） */
+{
+    /* Scene 0 */
+    puts("/* === Scene 0 : Memory Allocation for HOT NEWS ==================== */");
+    launchUNEXT();
+    sleep(2);
+
+    /* Scene 1 */
+    puts("\n/* === Scene 1 : Competitor Fee Hike Interrupt ==================== */");
+    enemyFeeRise();
+    sleep(2);
+
+    /* Scene 2 */
+    puts("\n/* === Scene 2 : Referral Link Injection ========================== */");
+    referralProgram();
+    sleep(2);
+
+    /* Scene 3 */
+    puts("\n/* === Scene 3 : Premium Card Coupon Thread ======================= */");
+    premiumProgram();
+    sleep(2);
+
+    /* Scene 4 */
+    puts("\n/* === Scene 4 : Rakuten Mobile Main Appeal Broadcast ============= */");
+    rakutenMobilePromo();
+    sleep(3);
+
+    /* キオスク向けフッター：申し込みURLを大きく表示 */
+    puts("\n\033[1;32m");
+    puts("  ┌─────────────────────────────────────────────────────────────┐");
+    puts("  │  📱 今すぐ申し込む！                                        │");
+    puts("  │     https://network.mobile.rakuten.co.jp/                   │");
+    puts("  │                                                             │");
+    puts("  │  🎁 紹介リンク（MNP:14,000pt / 新規:7,000pt）              │");
+    puts("  │     http://r10.to/hUqA5F                                    │");
+    puts("  └─────────────────────────────────────────────────────────────┘");
+    puts("\033[0m");
 }
 
 /* ----------------------------------------------------------------------- */
